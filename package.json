@@ -1,0 +1,12 @@
+{
+  "name": "bowling",
+  "version": "0.0.1",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericf89/bowling.git"
+  },
+  "dependencies": {
+    "express": "^4.9.7"
+  }
+}
