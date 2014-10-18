@@ -1,8 +1,10 @@
-require('../models/game.js');
-require('../models/score.js');
-var gameController = require('../controllers/game_controller.js'),
-	mongoose = require('mongoose'),
-	_ = require('underscore');
+var mongoose = require('mongoose'),
+	_ = require('underscore'),
+	path = require('path');
+require('../catwalk').walk(path.resolve(__dirname, '../models'), {quiet: true}); 
+var gameController = require('../controllers/game_controller.js');
+	
+
 
 
 describe("A game", function(){
