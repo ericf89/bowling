@@ -6,7 +6,7 @@ var mongoose = require('mongoose'),
 exports.createGame = function(playerNames, next){
 	var newGame = new Game();
 	var scores = playerNames.map(function(name){
-		return {playerName: name};
+		return new Score({playerName: name}).toObject();
 	});
 	Score.collection.insert(scores, function(err, scoreModels){
 		if(err) return next(err); 

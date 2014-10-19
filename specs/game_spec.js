@@ -3,9 +3,6 @@ var mongoose = require('mongoose'),
 	path = require('path');
 require('../catwalk').walk(path.resolve(__dirname, '../models'), {quiet: true}); 
 var gameController = require('../controllers/game_controller.js');
-	
-
-
 
 describe("A game", function(){
 	beforeEach(function(done){

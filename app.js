@@ -1,7 +1,6 @@
 var express = require('express'),
 	app = express(),
 	bodyParser = require('body-parser'),
-	server = require('http').Server(app),
 	path = require('path'),
 	catwalk = require('./catwalk');
 
