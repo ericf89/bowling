@@ -2,13 +2,13 @@ var mongoose = require('mongoose'),
 	_ = require('underscore'),
 	path = require('path');
 require('../catwalk').walk(path.resolve(__dirname, '../models'), {quiet: true}); 
-var gameController = require('../controllers/game_controller.js');
+var gameController = require('../controllers/gameController.js');
+var playerController = require('../controllers/playerController.js');
 
 describe("A game", function(){
 	beforeEach(function(done){
 		mongoose.connect('localhost/bowling_test', done);
 	}); 
-	
 	it('has a dateCreated property.', function(done){
 		gameController.createGame(['a'], function(err, newGame){
 			expect(newGame.dateCreated).toBeDefined(); 
@@ -18,24 +18,24 @@ describe("A game", function(){
 	});
 
 	it('needs at least one player.', function(done){
-		gameController.createGame([], function(err, newGame){
+		gameController.createGame([], function(err){
 			expect(err).not.toBe(null); 
 			done(); 
 		});
 	});
 
 	it('can\'t have more than 6 players', function(done){
-		gameController.createGame(['a', 'b', 'c', 'e', 'f', 'g', 'h'], function(err, newGame){
+		gameController.createGame(['a', 'b', 'c', 'e', 'f', 'g', 'h'], function(err){
 			expect(err).not.toBe(null); 
 			done(); 
 		});
 	});
 
-	it('has a playerScore for each player.', function(done){
+	it('has a score for each player.', function(done){
 		var playerNames = ['Alice', 'Bob', 'Carl'];
 		gameController.createGame(playerNames, function(err, newGame){
-			expect(newGame.playerScores).toBeDefined(); 
-			var uniquePlayerScores = _.uniq(newGame.playerScores);
+			expect(newGame.scores).toBeDefined(); 
+			var uniquePlayerScores = _.uniq(newGame.scores);
 			expect(uniquePlayerScores.length).toBe(playerNames.length); 
 			done();
 		});

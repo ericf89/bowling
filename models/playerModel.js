@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 
 var playerSchema = new Schema({
 	name: {type: String, required: true},
-	dateCreate: {type: Date, default: Date.now}
+	dateCreated: {type: Date, default: Date.now}
 });
 
 mongoose.model('Player', playerSchema);
