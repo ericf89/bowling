@@ -2,7 +2,11 @@ var express = require('express'),
 	app = express(),
 	bodyParser = require('body-parser'),
 	path = require('path'),
-	catwalk = require('./catwalk');
+	catwalk = require('./catwalk'),
+	mongoose = require('mongoose');
+
+var connectionString = process.env.MONGO_URL || 'localhost/bowling';
+mongoose.connect(connectionString);
 
 catwalk.walk(__dirname + '/models');
 
@@ -12,7 +16,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade'); 
 app.use(bodyParser.json());
 
-
+var games = require('./routes/gameRouter')(); 
+app.use('/games', games); 
 
 
 app.listen(app.get('port'), function(){

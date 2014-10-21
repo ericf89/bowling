@@ -7,18 +7,19 @@ var playerController = require('./playerController.js');
 
 
 exports.createGame = function(playerNames, next){
+	if(!playerNames || playerNames.length > 6)
+		return next({msg: 'Invalid number of players.'});
+
 	/*  
 		Create a new game instance.  This will generate the game id
 		that all the score objects need.
-	 */
+	 */ 
 	var newGame = new Game({}); 
-	
 	/*
 		This passes each player name to the player controller to fetch a
 		matching player.  If a player doesn't exist matching the name, 
 		a new one is created.   
 	*/
-
 	async.map(playerNames, playerController.getPlayer, function(err, players){
 		if(err) return next(err); 
 		

@@ -23,8 +23,6 @@ describe('The player controller', function(){
 	it('get an existing player by name.', function(done){
 		Player.create({name: 'JoeRegular'}, function(err, existingPlayer){
 			playerController.getPlayer('JoeRegular', function(err, testPlayer){
-				console.log(testPlayer);
-				console.log(existingPlayer); 
 				expect(err).toBe(null);
 				expect(testPlayer).toBeDefined(); 
 				expect(testPlayer._id).toEqual(existingPlayer._id);
