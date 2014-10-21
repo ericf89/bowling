@@ -1,4 +1,6 @@
-var game = require('express').Router(),
+var gameResource = require('express').Router(),
+	mongoose = require('mongoose'),
+	Game = mongoose.model('Game'),
 	gameController = require('../controllers/gameController'); 
 module.exports = function(){
 	/*	This endpoint expects a simple json object with an array of players. It
@@ -23,15 +25,31 @@ module.exports = function(){
 			}
 		}`
 	*/
-	game.post('/', function(req, res, next){
+	gameResource.post('/', function(req, res, next){
 		gameController.createGame(req.body.players, function(err, newGame){
 			if(err) return res.status(400).send({err: err});
 			return res.status(201).send({game: newGame});
 		});
 	});
+	
+	/*	Expects a gameId as a queryString parameter, and returns the corresponding game object
+		if it exists.  The associated score objects of this game will be populated for
+		convenience.  They contain the playerId that score belongs to,  and the frame data 
+		with that player's rolls this game. 
 
+		Returns 404 if the game doesn't exist.
+	*/ 
+	gameResource.get('/:gameId', function(req, res, next){
+		Game.findOne({_id : req.param('gameId')})
+		.populate('scores')
+		.exec(function(err, game){
+			if(err) return res.status(400).send({err: err});
+			if(!game) return res.sendStatus(404); 
+			return res.send(game.toJSON()); 
+		});
+	});
 
-	return game;   	
+	return gameResource;   	
 };
 
 
