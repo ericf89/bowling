@@ -11,7 +11,7 @@ var sum = function (a, b) { return a + b;};
 	If there there aren't enough rolls for the frame to calculate it's score,
 	its isComplete() will return false; 
 */
-var ScoreFrame = function(rolls){
+exports.ScoreFrame = function(rolls){
 	this.rolls = rolls || []; 
 	this.isComplete = function(){
 		if(this.isStrike() || this.isSpare()) return this.rolls.length === 3;
@@ -42,11 +42,16 @@ var ScoreFrame = function(rolls){
 		// second roll are greater than 10, you're probably doing something wrong... 
 		if(this.rolls[0] < 10 && this.rolls[0] + this.rolls[1] > 10) return false;
 
+		//If your first roll is a strike, and the frame is complete, 
+		if(this.isStrike() && this.isComplete() && this.rolls[1] !== 10){
+			console.log(this.rolls[2]);
+			return this.rolls[1] + this.rolls[2] <= 10 ;
+		}
 
 		return true; 
 	};
 };
-
+var ScoreFrame = exports.ScoreFrame;
 exports.getScoreAtFrame = function(rollScoreArray, frameIndex){
 	var score = 0,
 		i = 0,
