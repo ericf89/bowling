@@ -27,11 +27,11 @@ module.exports = function(){
 	*/
 	gameResource.post('/', function(req, res, next){
 		gameController.createGame(req.body.players, function(err, newGame){
-			if(err) return res.status(400).send({err: err});
-			return res.status(201).send({game: newGame});
+			if(err) return res.status(400).json({err: err});
+			return res.status(201).json({game: newGame});
 		});
 	});
-	
+
 	/*	Expects a gameId as a queryString parameter, and returns the corresponding game object
 		if it exists.  The associated score objects of this game will be populated for
 		convenience.  They contain the playerId that score belongs to,  and the frame data 
@@ -43,7 +43,7 @@ module.exports = function(){
 		Game.findOne({_id : req.param('gameId')})
 		.populate('scores')
 		.exec(function(err, game){
-			if(err) return res.status(400).send({err: err});
+			if(err) return res.status(400).json({err: err});
 			if(!game) return res.sendStatus(404); 
 			return res.send(game.toJSON()); 
 		});

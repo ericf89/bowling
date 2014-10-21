@@ -3,8 +3,8 @@ var _ = require('underscore');
 // Sum should be pretty self explanatory.... 
 var sum = function (a, b) { return a + b;}; 
 
-/*	This is a helper object to help with score calculation.
-	Each frame is capable of calculating its score, because it
+/*	This object is used primarily for score calculation.
+	Each frame is capable of calculating its score because it
 	includes not only its own rolls, but also the rolls of
 	future frames if necessary for calculation. 
 
@@ -12,7 +12,7 @@ var sum = function (a, b) { return a + b;};
 	its isComplete() will return false; 
 */
 var ScoreFrame = function(rolls){
-	this.rolls = rolls; 
+	this.rolls = rolls || []; 
 	this.isComplete = function(){
 		if(this.isStrike() || this.isSpare()) return this.rolls.length === 3;
 		return this.rolls.length === 2; 
@@ -27,7 +27,24 @@ var ScoreFrame = function(rolls){
 	};
 	this.score = function(){
 		return _.reduce(this.rolls, sum); 
-	}; 
+	};
+
+	this.isValid = function(){
+		var invalidRolls = _.some(this.rolls, function(roll){
+			return (roll > 10 || roll < 0); 
+		});
+		// As long as you've only rolled once this frame, you should be ok with any
+		// number between 0 and 10.
+		if(invalidRolls) return false;   
+		if(!invalidRolls && this.rolls.length <=1) return true;  
+		
+		// If you've rolled more than once,  and your first roll and your
+		// second roll are greater than 10, you're probably doing something wrong... 
+		if(this.rolls[0] < 10 && this.rolls[0] + this.rolls[1] > 10) return false;
+
+
+		return true; 
+	};
 };
 
 exports.getScoreAtFrame = function(rollScoreArray, frameIndex){

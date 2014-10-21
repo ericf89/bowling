@@ -16,8 +16,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade'); 
 app.use(bodyParser.json());
 
-var games = require('./routes/gameRouter')(); 
+var games = require('./routes/gameRouter')(),
+	scores = require('./routes/scoreRouter')();
+
 app.use('/games', games); 
+app.use('/scores', scores); 
 
 
 app.listen(app.get('port'), function(){

@@ -48,7 +48,3 @@ exports.createGame = function(playerNames, next){
 		});
 	});
 };
-
-// exports.addPlayerToGame = function(playerName, next){
-
-// };
