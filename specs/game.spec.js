@@ -32,7 +32,7 @@ describe("In the gameController", function(){
 			});
 		});
 
-		it('should create has a score for each player.', function(done){
+		it('should create an unique score for each player.', function(done){
 			var playerNames = ['Alice', 'Bob', 'Carl'];
 			gameController.createGame(playerNames, function(err, newGame){
 				expect(newGame.scores).toBeDefined(); 

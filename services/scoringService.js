@@ -44,7 +44,6 @@ exports.ScoreFrame = function(rolls){
 
 		//If your first roll is a strike, and the frame is complete, 
 		if(this.isStrike() && this.isComplete() && this.rolls[1] !== 10){
-			console.log(this.rolls[2]);
 			return this.rolls[1] + this.rolls[2] <= 10 ;
 		}
 

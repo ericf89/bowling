@@ -112,6 +112,10 @@ describe('In the scoring service,', function(){
 			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 1)).toBe(8);
 			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 2)).toBe(17);
 			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 3)).toBe(null);
+
+			pinsKnockedDown =[10, 10];
+			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 1)).toBe(null);
+			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 2)).toBe(null); 
 		});
 	});
 });

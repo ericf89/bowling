@@ -54,11 +54,50 @@ describe('The scoreFrame\'s', function(){
 		it('should return true if the first roll is a 10.', function(){
 			var frame = new ScoreFrame([10]);
 			expect(frame.isStrike()).toBe(true); 
+			
 			frame = new ScoreFrame([10, 8, 2]);
 			expect(frame.isStrike()).toBe(true); 
 		});
-		it('should return false if the first roll isn\'t a 10.', function(){
 
+		it('should return false if the first roll isn\'t a 10.', function(){
+			var frame = new ScoreFrame([8, 2]);
+			expect(frame.isStrike()).toBe(false); 
+
+			frame = new ScoreFrame([7, 3, 8]);
+			expect(frame.isStrike()).toBe(false); 
+		});
+
+		it('should return false for an open frame.', function(){
+			var frame = new ScoreFrame([3, 4]);
+			expect(frame.isStrike()).toBe(false); 
+		});
+	});
+
+	describe('isSpare() method', function(){
+		it('should return true if the first two rolls sum to 10', function(){
+			var frame = new ScoreFrame([4, 6]);
+			expect(frame.isSpare()).toBe(true); 
+		});
+		it('should return false if the first roll is 10.', function(){
+			var frame = new ScoreFrame([10]);
+			expect(frame.isSpare()).toBe(false);
+		});
+		it('should return false for an open frame.', function(){
+			var frame = new ScoreFrame([1, 6]);
+			expect(frame.isSpare()).toBe(false);
+		});
+	});
+
+	describe('score() method', function(){
+		it('should return the sum of the rolls.', function(){
+			var frame = new ScoreFrame([1,3]);
+			expect(frame.score()).toBe(4);
+
+			frame = new ScoreFrame([8, 2, 4]);
+			expect(frame.score()).toBe(14);
+
+			frame = new ScoreFrame([10, 5, 4]);
+			expect(frame.score()).toBe(19);
 		});
 	});
 });
