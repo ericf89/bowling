@@ -6,7 +6,7 @@ module.exports = function(){
 	// ### POST: game/
 	// This endpoint expects a simple json object with an array of players. It
 	// will lookup/create a player object for each of those player names.
-	// ```
+	// ```k
 	// { 
 	// 	"players": ["Carl", "Rick"]
 	// }

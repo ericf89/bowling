@@ -8,8 +8,8 @@ var playerController = require('./playerController.js');
 // ###createGame()
 // Creates a new game from an array of player names.
 exports.createGame = function(playerNames, next){
-	if(!playerNames || playerNames.length > 6)
-		return next({msg: 'Invalid number of players.'});
+	if(!playerNames || playerNames.length < 1 || playerNames.length > 6)
+		return next({msg: 'You need 1 to 6 players names for a game of bowling!'});
 
 	// Create a new game instance.  This will generate the game id
 	// that all the score objects need.

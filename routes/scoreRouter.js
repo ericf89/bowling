@@ -24,14 +24,7 @@ module.exports = function(){
 	//   "game":"5447481b12d0a496dfa27bb3",
 	//   "__v":1,
 	//   "dateCreated":"2014-10-22T06:00:59.483Z",
-	//   "rolls":[ 4, 5, 10, 4, 4, 5, 5, 2, 0 ]
-	// }
-	// ```
-	// Requesting with ?pretty=true will return you a formatted score object, with roll data
-	// broken down into frames, and each containing a running score as the game progresses.
-	// ```
-	// {
-	//   "playerName":"Carl",
+	//   "rolls":[ 4, 5, 10, 4, 4, 5, 5, 2, 0 ],
 	//   "frames":[
 	//     {
 	//       "firstRoll":"4",
@@ -60,20 +53,15 @@ module.exports = function(){
 	//     }
 	//   ]
 	// }
-	// ```
 	scoreResource.get('/:scoreId', function(req, res, next){
 		Score.findOne({_id : req.param('scoreId')})
 		.populate('player')
 		.exec(function(err, score){
 			if(err) return res.status(500).json({err: err});
 			if(!score) return res.sendStatus(404);
-			if(req.query.pretty){
-				var prettyScore = {};
-				prettyScore.playerName = score.player.name;
-				prettyScore.frames = scoreController.getFrameByFrameScores(score.rolls); 
-				return res.send(JSON.stringify(prettyScore, null, '\t'));
-			} 
-			return res.send(score.toJSON());
+			score = score.toObject();
+			score.frames = scoreController.getFrameByFrameScores(score.rolls); 
+			return req.query.pretty ? res.send(JSON.stringify(score, null, '\t')) : res.json(score);
 		});
 	});
 	// ### POST: /scores/:scoreId
@@ -101,7 +89,34 @@ module.exports = function(){
 	//   "game":"5447481b12d0a496dfa27bb3",
 	//   "__v":1,
 	//   "dateCreated":"2014-10-22T06:00:59.483Z",
-	//   "rolls":[ 4, 5, 10, 4, 4, 5, 5, 2, 0 ]
+	//   "rolls":[ 4, 5, 10, 4, 4, 5, 5, 2, 0 ],
+	//   "frames":[
+	//     {
+	//       "firstRoll":"4",
+	//       "secondRoll":"5",
+	//       "score":9
+	//     },
+	//     {
+	//       "firstRoll":"X",
+	//       "secondRoll":"",
+	//       "score":27
+	//     },
+	//     {
+	//       "firstRoll":"4",
+	//       "secondRoll":"4",
+	//       "score":35
+	//     },
+	//     {
+	//       "firstRoll":"5",
+	//       "secondRoll":"/",
+	//       "score":47
+	//     },
+	//     {
+	//       "firstRoll":"2",
+	//       "secondRoll":"0",
+	//       "score":49
+	//     }
+	//   ]
 	// }
 	// ```    
 	scoreResource.post('/:scoreId', function(req, res, next){
@@ -110,8 +125,9 @@ module.exports = function(){
 		scoreController.appendNewRollsToScore(req.param('scoreId'), newRolls, function(err, updatedScore){
 			if(err) return res.status(400).json({err: err});
 			if(!updatedScore) return res.sendStatus(404); 
-
-			return res.status(200).send(updatedScore.toJSON()); 
+			updatedScore = score.toObject();
+			updatedScore.frames = scoreController.getFrameByFrameScores(updatedScore.rolls); 
+			return res.status(200).json(updatedScore); 
 		});
 	});
 	return scoreResource;   	

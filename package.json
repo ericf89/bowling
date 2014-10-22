@@ -2,6 +2,10 @@
   "name": "bowling",
   "version": "0.0.1",
   "main": "app.js",
+  "description": "A simple bowling API.",
+  "scripts": {
+    "test": "./node_modules/jasmine-node/bin/jasmine-node specs/ --verbose --color"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ericf89/bowling.git"
@@ -10,8 +14,10 @@
     "async": "^0.9.0",
     "body-parser": "^1.9.0",
     "express": "^4.9.7",
+    "jade": "^1.7.0",
     "jasmine-node": "^1.14.5",
-    "mockgoose": "^1.10.7",
+    "markdown": "^0.5.0",
+    "marked": "^0.3.2",
     "mongoose": "^3.8.17",
     "underscore": "^1.7.0"
   }

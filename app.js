@@ -1,5 +1,3 @@
-// ##Bowling App
-// This is a pretty boiler plate express app. I'm using: 
 // - Express: For routing!  
 // - Body-parser: A module that parses out the raw body of the request into a usable js object. 
 // - Path:  Used for resolving file paths.
@@ -13,24 +11,29 @@ var express = require('express'),
 	mongoose = require('mongoose');
 
 var connectionString = process.env.MONGO_URL || 'localhost/bowling';
-mongoose.connect(connectionString);  // Connection to the DB!
+mongoose.connect(connectionString);
 
-catwalk.walk(__dirname + '/models');  // Load our Schemas!
+catwalk.walk(__dirname + '/models');
 
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views')); 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');  
-app.use(bodyParser.json()); //Boiler plate stuff....
-
-// These 4 lines load our two routers, and set up requests to 
-// the /games and /scores endpoints to be routed correctly. 
+app.use(bodyParser.json());
 
 var games = require('./routes/gameRouter')(),
 	scores = require('./routes/scoreRouter')();
 app.use('/games', games); 
 app.use('/scores', scores); 
 
+var markdown = require('marked'),
+	fs = require('fs'); 
+app.get('/', function(req, res, next){
+	fs.readFile('./README.md', 'utf-8', function (err, data){
+		if(err) return next(err); 
+		return res.render('index', {content:markdown(data)});
+	});
+});
 
 app.listen(app.get('port'), function(){
 	console.log('Listening on ' + app.get('port') + ' ...'); 

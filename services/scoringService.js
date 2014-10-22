@@ -8,8 +8,8 @@ var sum = function (a, b) { return a + b;}; // Sum should be pretty self explana
 // includes not only its own rolls, but also the rolls of
 // future frames as necessary for strikes and spares. 
 //
-// If there there aren't enough rolls for the frame to calculate it's score,
-// its isComplete() will return false; 
+// If there there aren't enough rolls for the frame to calculate its score,
+// its isComplete() will return false. 
 
 exports.ScoreFrame = function(rolls){
 	this.rolls = rolls || []; 
@@ -31,7 +31,7 @@ exports.ScoreFrame = function(rolls){
 
 	// #####.isValid()
 	// This method is used extensively in validating new rolls that are posted
-	// to the score endpoint.  First we iterate through the 1 to three rolls in this 
+	// to the score endpoint.  First we iterate through the 1 to 3 rolls in this 
 	// frame, and if  any aren't valid, we set invalid rolls to true.
 	this.isValid = function(){
 		var invalidRolls = _.some(this.rolls, function(roll){
@@ -76,7 +76,7 @@ exports.getScoreAtFrame = function(rollScoreArray, frameIndex){
 
 	// First check to make sure that this is a valid frame get a score for.
 	// If we don't have enough data for calculating score at the requested frame
-	// because of strikes or spares,  we'll return null;
+	// because of strikes or spares, it will return null;
 	
 	if(!frames[frameIndex-1] || !frames[frameIndex-1].isComplete())
 		return null; 

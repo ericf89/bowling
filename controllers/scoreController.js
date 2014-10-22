@@ -61,15 +61,32 @@ exports.getFrameByFrameScores = function(rollArray){
 		if(thisFrame.isStrike()){
 			prettyFrame.firstRoll = 'X';
 			prettyFrame.secondRoll = ''; 
+
+			if(i===10){
+				if(thisFrame.rolls[1] !== undefined){
+					prettyFrame.secondRoll = thisFrame.rolls[1] === 10 ? prettyFrame.secondRoll = 'X' : thisFrame.rolls[1] + ''; 
+				}
+				if(thisFrame.rolls[2] !== undefined){
+					prettyFrame.thirdRoll = thisFrame.rolls[2] === 10 ? prettyFrame.thirdRoll = '/' : thisFrame.rolls[2] + ''; 
+				}
+			}
+
 		}else if(thisFrame.isSpare()){
 			prettyFrame.firstRoll = thisFrame.rolls[0] + '';
 			prettyFrame.secondRoll = '/'; 
+
+			if(i===10){
+				if(thisFrame.rolls[2] !== undefined){
+					prettyFrame.thirdRoll = thisFrame.rolls[2] === 10 ? prettyFrame.thirdRoll = 'X': thisFrame.rolls[2] + '';
+				}
+			}
 		}else{
 			prettyFrame.firstRoll = thisFrame.rolls[0] + '';
 			prettyFrame.secondRoll = thisFrame.rolls[1] === undefined ? '' : thisFrame.rolls[1] + '';
 		}
+
+
 		prettyFrame.score = scoringService.getScoreAtFrame(rollArray, i); 
-		
 		runningFrames.push(prettyFrame);
 	}
 	return runningFrames; 
