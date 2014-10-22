@@ -28,7 +28,7 @@ describe('The scoreFrame\'s', function(){
 			expect(frame.isValid()).toBe(true); 
 		});
 
-		it('should return false if you enter invalid roll data.', function(){
+		it('should return false for invalid roll data.', function(){
 			var frame = new ScoreFrame([11]); 
 			expect(frame.isValid()).toBe(false);
 
@@ -98,6 +98,36 @@ describe('The scoreFrame\'s', function(){
 
 			frame = new ScoreFrame([10, 5, 4]);
 			expect(frame.score()).toBe(19);
+		});
+	});
+
+	describe('isComplete() method', function(){
+		it('should return true if a strike and has 3 rolls.', function(){
+			var frame = new ScoreFrame([10, 10, 10]);
+			expect(frame.isComplete()).toBe(true); 
+		});
+
+		it('should return true if a spare and has 3 rolls.', function(){
+			var frame = new ScoreFrame([5, 5, 8]);
+			expect(frame.isComplete()).toBe(true); 
+		});
+
+		it('should return true if open and has 2 rolls.', function(){
+			var frame = new ScoreFrame([4, 4]);
+			expect(frame.isComplete()).toBe(true); 
+		});
+
+		it('should return false if spare or strike without 3 rolls.', function(){
+			var frame = new ScoreFrame([10, 1]); 
+			expect(frame.isComplete()).toBe(false);
+
+			frame = new ScoreFrame([5, 5]);
+			expect(frame.isComplete()).toBe(false); 
+		});
+
+		it('should return false if open and has a single roll.', function(){
+			var frame = new ScoreFrame([0]);
+			expect(frame.isComplete()).toBe(false); 
 		});
 	});
 });

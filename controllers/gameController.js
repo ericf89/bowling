@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
 
 var playerController = require('./playerController.js'); 
 
-
+// ##Creates a new game from an array of player names.
 exports.createGame = function(playerNames, next){
 	if(!playerNames || playerNames.length > 6)
 		return next({msg: 'Invalid number of players.'});

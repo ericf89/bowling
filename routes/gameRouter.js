@@ -37,13 +37,13 @@ module.exports = function(){
 		convenience.  They contain the playerId that score belongs to,  and the frame data 
 		with that player's rolls this game. 
 
-		Returns 404 if the game doesn't exist.
+		Returns 404 if the game doesn't” exist.
 	*/ 
 	gameResource.get('/:gameId', function(req, res, next){
 		Game.findOne({_id : req.param('gameId')})
 		.populate('scores')
 		.exec(function(err, game){
-			if(err) return res.status(400).json({err: err});
+			if(err) return res.status(500).json({err: err});
 			if(!game) return res.sendStatus(404); 
 			return res.send(game.toJSON()); 
 		});

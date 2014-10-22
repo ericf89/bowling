@@ -5,7 +5,7 @@ require('../catwalk').walk(path.resolve(__dirname, '../models'), {quiet: true});
 var gameController = require('../controllers/gameController.js');
 var playerController = require('../controllers/playerController.js');
 
-describe("In the gameController", function(){
+describe('In the gameController', function(){
 	beforeEach(function(done){
 		mongoose.connect('localhost/bowling_test', done);
 	}); 

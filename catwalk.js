@@ -1,5 +1,5 @@
 var fs = require('fs'); 
-
+// Helper function to import all our mongoose models. 
 exports.walk = function(path, opts) {
     opts = opts || {}; 
     if(!opts.quiet)console.log("Models Directory: " + path);
