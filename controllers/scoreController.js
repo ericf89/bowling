@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
 	scoringService = require('../services/scoringService'),
 	_ = require('underscore');
 
-// Validates an arrays of rolls by importing the roll data into a scoreFrame 
+// ###canAcceptAnotherRoll(rollAray)
+// This function validates an array of rolls by importing the roll data into a scoreFrame 
 // array, and checking that each frame in the resulting array is valid.   
 exports.canAcceptAnotherRoll = function (rollArray){
 	var frames = scoringService.importRollsToScoreFrames(rollArray);
@@ -16,6 +17,8 @@ exports.canAcceptAnotherRoll = function (rollArray){
 	
 };
 var canAcceptAnotherRoll = exports.canAcceptAnotherRoll;
+
+// ###appendNewRollsToScore(scoreId, rolls, next)
 // This function appends new rolls to the end of the roll array for a particular 
 // score. The new data to be appended is first validated through the canAcceptAnotherRoll
 // method, which checks that the game isn't already over and that the order of the rolls
@@ -42,6 +45,7 @@ exports.appendNewRollsToScore = function(scoreId, rolls, next){
 	});
 };
 
+// ###getFrameByFrameScores(rollArray)
 // This function returns a 'pretty' array of frames, built from a roll array.  Each frame
 // in this array has firstRoll and secondRoll properties along with a score property which
 // represents the running score up to that point in the game.  
@@ -62,7 +66,7 @@ exports.getFrameByFrameScores = function(rollArray){
 			prettyFrame.secondRoll = '/'; 
 		}else{
 			prettyFrame.firstRoll = thisFrame.rolls[0] + '';
-			prettyFrame.secondRoll = (thisFrame.rolls[1] || '') + '';
+			prettyFrame.secondRoll = thisFrame.rolls[1] === undefined ? '' : thisFrame.rolls[1] + '';
 		}
 		prettyFrame.score = scoringService.getScoreAtFrame(rollArray, i); 
 		

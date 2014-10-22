@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>scoreController.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="gameController.html">
+                gameController.js
+              </a>
+            
+              
+              <a class="source" href="playerController.html">
+                playerController.js
+              </a>
+            
+              
+              <a class="source" href="scoreController.html">
+                scoreController.js
+              </a>
+            
+              
+              <a class="source" href="gameRouter.html">
+                gameRouter.js
+              </a>
+            
+              
+              <a class="source" href="scoreRouter.html">
+                scoreRouter.js
+              </a>
+            
+              
+              <a class="source" href="scoringService.html">
+                scoringService.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>scoreController.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>),
+	Score = mongoose.model(<span class="hljs-string">'Score'</span>),
+	scoringService = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../services/scoringService'</span>),
+	_ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h3 id="canacceptanotherroll-rollaray-">canAcceptAnotherRoll(rollAray)</h3>
+<p>This function validates an array of rolls by importing the roll data into a scoreFrame 
+array, and checking that each frame in the resulting array is valid.   </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.canAcceptAnotherRoll = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(rollArray)</span></span>{
+	<span class="hljs-keyword">var</span> frames = scoringService.importRollsToScoreFrames(rollArray);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>If we have any invalid frames, we shouldn’t accept more data;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">if</span>(!(_.every(frames, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(frame)</span></span>{ <span class="hljs-keyword">return</span> frame.isValid();}))) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Otherwise, if we’re not in the last frame, or we’re in the last frame and need more data,
+accept more rolls!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">return</span> frames.length &lt; <span class="hljs-number">10</span> || !(frames[<span class="hljs-number">9</span>].isComplete());
+	
+};
+<span class="hljs-keyword">var</span> canAcceptAnotherRoll = exports.canAcceptAnotherRoll;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h3 id="appendnewrollstoscore-scoreid-rolls-next-">appendNewRollsToScore(scoreId, rolls, next)</h3>
+<p>This function appends new rolls to the end of the roll array for a particular 
+score. The new data to be appended is first validated through the canAcceptAnotherRoll
+method, which checks that the game isn’t already over and that the order of the rolls
+being passed in is valid.  If any invalid data is detected, the entirety of the new
+array is thrown away, and an error is returned.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.appendNewRollsToScore = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(scoreId, rolls, next)</span></span>{
+	Score.findOne({_id: scoreId}, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, score)</span></span>{
+		<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> next(err);
+		<span class="hljs-keyword">if</span>(!score) <span class="hljs-keyword">return</span> next(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);
+
+		<span class="hljs-keyword">if</span>(!canAcceptAnotherRoll(score.rolls)) <span class="hljs-keyword">return</span> next({msg:<span class="hljs-string">'This game looks like it\'s already finished'</span>});
+
+		<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; rolls.length; i++){
+			<span class="hljs-keyword">if</span>(canAcceptAnotherRoll(score.rolls)){
+				score.rolls.push(rolls[i]);
+			}<span class="hljs-keyword">else</span>{
+				<span class="hljs-keyword">return</span> next({msg: <span class="hljs-string">'Incompatible roll data...'</span>});
+			}
+		}
+		score.save(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err)</span></span>{
+			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> next(err); 
+			<span class="hljs-keyword">return</span> next(<span class="hljs-literal">null</span>, score); 
+		});
+	});
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h3 id="getframebyframescores-rollarray-">getFrameByFrameScores(rollArray)</h3>
+<p>This function returns a ‘pretty’ array of frames, built from a roll array.  Each frame
+in this array has firstRoll and secondRoll properties along with a score property which
+represents the running score up to that point in the game.  </p>
+<p>Spares and strikes are replaced accordingly with ‘/‘ and ‘X’.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.getFrameByFrameScores = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(rollArray)</span></span>{
+	<span class="hljs-keyword">var</span> scoreFrames = scoringService.importRollsToScoreFrames(rollArray); 
+	<span class="hljs-keyword">var</span> runningFrames = [];
+
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">1</span>; i &lt;= scoreFrames.length; i++){
+		<span class="hljs-keyword">var</span> prettyFrame = {},
+			thisFrame = scoreFrames[i-<span class="hljs-number">1</span>];
+		<span class="hljs-keyword">if</span>(thisFrame.isStrike()){
+			prettyFrame.firstRoll = <span class="hljs-string">'X'</span>;
+			prettyFrame.secondRoll = <span class="hljs-string">''</span>; 
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(thisFrame.isSpare()){
+			prettyFrame.firstRoll = thisFrame.rolls[<span class="hljs-number">0</span>] + <span class="hljs-string">''</span>;
+			prettyFrame.secondRoll = <span class="hljs-string">'/'</span>; 
+		}<span class="hljs-keyword">else</span>{
+			prettyFrame.firstRoll = thisFrame.rolls[<span class="hljs-number">0</span>] + <span class="hljs-string">''</span>;
+			prettyFrame.secondRoll = thisFrame.rolls[<span class="hljs-number">1</span>] === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">''</span> : thisFrame.rolls[<span class="hljs-number">1</span>] + <span class="hljs-string">''</span>;
+		}
+		prettyFrame.score = scoringService.getScoreAtFrame(rollArray, i); 
+		
+		runningFrames.push(prettyFrame);
+	}
+	<span class="hljs-keyword">return</span> runningFrames; 
+};</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
