@@ -122,3 +122,55 @@ exports.importRollsToScoreFrames = function(rollScoreArray){
 	}
 	return frames; 
 };
+
+// ###getFrameByFrameScores(rollArray)
+// This function returns a 'pretty' array of frames, built from a roll array.  Each frame
+// in this array has firstRoll and secondRoll properties along with a score property which
+// represents the running score up to that point in the game.  
+//
+// Spares and strikes are replaced accordingly with '/' and 'X'.
+exports.getFrameByFrameScores = function(rollArray){
+	var scoreFrames = scoringService.importRollsToScoreFrames(rollArray); 
+	var runningFrames = [];
+
+	for(var i = 1; i <= scoreFrames.length; i++){
+		var prettyFrame = {},
+			thisFrame = scoreFrames[i-1];
+		if(thisFrame.isStrike()){
+			prettyFrame.firstRoll = 'X';
+			prettyFrame.secondRoll = ''; 
+
+			if(i===10){
+				if(thisFrame.rolls[1] !== undefined){
+					prettyFrame.secondRoll = thisFrame.rolls[1] === 10 ? prettyFrame.secondRoll = 'X' : thisFrame.rolls[1] + ''; 
+				}
+				if(thisFrame.rolls[2] !== undefined){
+					if(thisFrame.rolls[2] === 10 && thisFrame.rolls[1] === 10){
+						prettyFrame.thirdRoll = 'X';	
+					} 
+					else{
+						prettyFrame.thirdRoll = thisFrame.rolls[2] === 10 ? prettyFrame.thirdRoll = '/' : thisFrame.rolls[2] + ''; 
+					}
+				}
+			}
+
+		}else if(thisFrame.isSpare()){
+			prettyFrame.firstRoll = thisFrame.rolls[0] + '';
+			prettyFrame.secondRoll = '/'; 
+
+			if(i===10){
+				if(thisFrame.rolls[2] !== undefined){
+					prettyFrame.thirdRoll = thisFrame.rolls[2] === 10 ? prettyFrame.thirdRoll = 'X': thisFrame.rolls[2] + '';
+				}
+			}
+		}else{
+			prettyFrame.firstRoll = thisFrame.rolls[0] + '';
+			prettyFrame.secondRoll = thisFrame.rolls[1] === undefined ? '' : thisFrame.rolls[1] + '';
+		}
+
+
+		prettyFrame.score = scoringService.getScoreAtFrame(rollArray, i); 
+		runningFrames.push(prettyFrame);
+	}
+	return runningFrames; 
+};

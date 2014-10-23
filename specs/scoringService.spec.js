@@ -118,6 +118,51 @@ describe('In the scoring service,', function(){
 			expect(scoringService.getScoreAtFrame(pinsKnockedDown, 2)).toBe(null); 
 		});
 	});
+
+	describe('the getFrameByFrameScores method', function(){
+		it('should correctly format a strike frame.', function(){
+			var frames = scoringService.getFrameByFrameScores([10, 5, 4]);
+			expect(frames.length).toBe(2); 
+			expect(frames[0].firstRoll).toBe('X');
+			expect(frames[0].secondRoll).toBe(''); 
+			expect(frames[0].score).toBe(19);
+
+			expect(frames[1].firstRoll).toBe('5');
+			expect(frames[1].secondRoll).toBe('4'); 
+			expect(frames[1].score).toBe(28);
+		});
+
+		it('should correctly format a spare frame.', function(){
+			var frames = scoringService.getFrameByFrameScores([5, 5, 7]);
+			expect(frames.length).toBe(2); 
+			expect(frames[0].firstRoll).toBe('5');
+			expect(frames[0].secondRoll).toBe('/'); 
+			expect(frames[0].score).toBe(17);
+
+			expect(frames[1].firstRoll).toBe('7');
+			expect(frames[1].secondRoll).toBe(''); 
+			expect(frames[1].score).toBe(null);
+		});
+
+		it('should correctly format a spare in the last frame.', function(){
+			var frames = scoringService.getFrameByFrameScores([10, 10, 10, 10, 10, 10, 10, 10, 10, 8, 2, 5]);
+
+			expect(frames.length).toBe(10); 
+			expect(frames[9].firstRoll).toBe('8');
+			expect(frames[9].secondRoll).toBe('/'); 
+			expect(frames[9].thirdRoll).toBe('5');
+			expect(frames[9].score).toBe(273); 
+
+		}); 
+		it('should correctly format a strike in the last frame.', function(){
+			var frames = scoringService.getFrameByFrameScores([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 8]);
+			expect(frames.length).toBe(10); 
+			expect(frames[9].firstRoll).toBe('X');
+			expect(frames[9].secondRoll).toBe('0'); 
+			expect(frames[9].thirdRoll).toBe('8');
+			expect(frames[9].score).toBe(278); 
+		});
+	});
 });
 
 function validateOpenFrame(frame){

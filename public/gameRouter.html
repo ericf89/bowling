@@ -19,11 +19,6 @@
           <div id="jump_page">
             
               
-              <a class="source" href="app.html">
-                app.js
-              </a>
-            
-              
               <a class="source" href="gameController.html">
                 gameController.js
               </a>
@@ -79,7 +74,9 @@
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> gameResource = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>).Router(),
 	mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>),
 	Game = mongoose.model(<span class="hljs-string">'Game'</span>),
-	gameController = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../controllers/gameController'</span>); 
+	Player = mongoose.model(<span class="hljs-string">'Player'</span>),
+	gameController = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../controllers/gameController'</span>),
+	async = <span class="hljs-built_in">require</span>(<span class="hljs-string">'async'</span>); 
 <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{</pre></div></div>
             
         </li>
@@ -91,13 +88,44 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h3 id="post-game-">POST: game/</h3>
+              <h3 id="get-games-">GET: games/</h3>
+<p><code>GET</code>ing games/ will return the full collection of games in the database.  All subdocuments for players and scores will 
+be populated for your convenience. 
+<a href="https://gist.github.com/ericf89/f1342430e7ae8d883d3e">Example Response</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	gameResource.get(<span class="hljs-string">'/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, next)</span></span>{
+		Game.find({})
+		.populate(<span class="hljs-string">'scores'</span>)
+		.exec(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, games)</span></span>{
+			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).json(err);
+			
+			async.map(games, gameController.populatePlayersInGame, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, populatedGames)</span></span>{
+				<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).json(err);
+				populatedGames = populatedGames.map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(populatedGame)</span></span>{ <span class="hljs-keyword">return</span> populatedGame.toObject({virtuals: <span class="hljs-literal">true</span>});});
+				<span class="hljs-keyword">return</span> res.json(populatedGames);	
+			});
+		});
+	});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h3 id="post-games-">POST: games/</h3>
 <p>This endpoint expects a simple json object with an array of players. It
 will lookup/create a player object for each of those player names.</p>
-<pre><code>{ 
+<pre><code class="lang-k">{ 
     <span class="hljs-string">"players"</span>: [<span class="hljs-string">"Carl"</span>, <span class="hljs-string">"Rick"</span>]
 }
-</code></pre><p>If you properly format your json, and follow all the bowling rules, 
+</code></pre>
+<p>If you properly format your json, and follow all the bowling rules, 
 (0 &lt; #ofPlayers &lt; 7), you’ll receive a response containing your new gameID, and ids of the scores objects for this game.</p>
 <pre><code class="lang-js">{
     game: {
@@ -118,25 +146,25 @@ will lookup/create a player object for each of those player names.</p>
             <div class="content"><div class='highlight'><pre>	gameResource.post(<span class="hljs-string">'/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, next)</span></span>{
 		gameController.createGame(req.body.players, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, newGame)</span></span>{
 			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">400</span>).json({err: err});
-			<span class="hljs-keyword">return</span> res.status(<span class="hljs-number">201</span>).json({game: newGame});
+			<span class="hljs-keyword">return</span> res.status(<span class="hljs-number">201</span>).send(newGame.toJSON());
 		});
 	});</pre></div></div>
             
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <h3 id="get-game-gameid">GET: game/:gameId</h3>
+              <h3 id="get-games-gameid">GET: games/:gameId</h3>
 <p>This endpoint expects a gameId in the url of the request, and returns 
 the corresponding game object if it exists.  </p>
 <pre><code class="lang-url">http://localhost:3000/games/5447481b12d0a496dfa27bb3
 </code></pre>
-<p>The associated score objects of this game will be populated for convenience.<br>The score objects contain the playerId that score belongs to,  and the frame data  with 
+<p>The associated score and player objects of this game will be populated for convenience.<br>The score objects contain the player that score belongs to,  and the frame data  with 
 that player’s rolls this game.</p>
 <pre><code class="lang-js">{
   <span class="hljs-string">"_id"</span>:<span class="hljs-string">"5447481b12d0a496dfa27bb3"</span>,
@@ -172,7 +200,10 @@ that player’s rolls this game.</p>
 		.exec(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, game)</span></span>{
 			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).json({err: err});
 			<span class="hljs-keyword">if</span>(!game) <span class="hljs-keyword">return</span> res.sendStatus(<span class="hljs-number">404</span>); 
-			<span class="hljs-keyword">return</span> res.send(game.toJSON()); 
+			gameController.populatePlayersInGame(game, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, populatedGame)</span></span>{
+				<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).json({err: err});
+				<span class="hljs-keyword">return</span> res.send(game.toJSON({virtuals:<span class="hljs-literal">true</span>})); 
+			});
 		});
 	});
 

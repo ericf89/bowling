@@ -1,9 +1,30 @@
 var gameResource = require('express').Router(),
 	mongoose = require('mongoose'),
 	Game = mongoose.model('Game'),
-	gameController = require('../controllers/gameController'); 
+	Player = mongoose.model('Player'),
+	gameController = require('../controllers/gameController'),
+	async = require('async'); 
 module.exports = function(){
-	// ### POST: game/
+	
+	// ### GET: games/
+	// `GET`ing games/ will return the full collection of games in the database.  All subdocuments for players and scores will 
+	// be populated for your convenience. 
+	// [Example Response](https://gist.github.com/ericf89/f1342430e7ae8d883d3e)
+	gameResource.get('/', function(req, res, next){
+		Game.find({})
+		.populate('scores')
+		.exec(function(err, games){
+			if(err) return res.status(500).json(err);
+			
+			async.map(games, gameController.populatePlayersInGame, function(err, populatedGames){
+				if(err) return res.status(500).json(err);
+				populatedGames = populatedGames.map(function(populatedGame){ return populatedGame.toObject({virtuals: true});});
+				return res.json(populatedGames);	
+			});
+		});
+	});
+
+	// ### POST: games/
 	// This endpoint expects a simple json object with an array of players. It
 	// will lookup/create a player object for each of those player names.
 	// ```k
@@ -31,18 +52,18 @@ module.exports = function(){
 	gameResource.post('/', function(req, res, next){
 		gameController.createGame(req.body.players, function(err, newGame){
 			if(err) return res.status(400).json({err: err});
-			return res.status(201).json({game: newGame});
+			return res.status(201).send(newGame.toJSON());
 		});
 	});
 
-	// ### GET: game/:gameId
+	// ### GET: games/:gameId
 	// This endpoint expects a gameId in the url of the request, and returns 
 	// the corresponding game object if it exists.  
 	// ```url
 	// http://localhost:3000/games/5447481b12d0a496dfa27bb3
 	// ```
-	// The associated score objects of this game will be populated for convenience.  
-	// The score objects contain the playerId that score belongs to,  and the frame data  with 
+	// The associated score and player objects of this game will be populated for convenience.  
+	// The score objects contain the player that score belongs to,  and the frame data  with 
 	// that player's rolls this game.
 	// ```js 
 	// {
@@ -76,7 +97,10 @@ module.exports = function(){
 		.exec(function(err, game){
 			if(err) return res.status(500).json({err: err});
 			if(!game) return res.sendStatus(404); 
-			return res.send(game.toJSON()); 
+			gameController.populatePlayersInGame(game, function(err, populatedGame){
+				if(err) return res.status(500).json({err: err});
+				return res.send(game.toJSON({virtuals:true})); 
+			});
 		});
 	});
 

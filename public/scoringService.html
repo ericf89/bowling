@@ -19,11 +19,6 @@
           <div id="jump_page">
             
               
-              <a class="source" href="app.html">
-                app.js
-              </a>
-            
-              
               <a class="source" href="gameController.html">
                 gameController.js
               </a>
@@ -94,8 +89,8 @@
 Each frame is capable of calculating its score because it
 includes not only its own rolls, but also the rolls of
 future frames as necessary for strikes and spares. </p>
-<p>If there there aren’t enough rolls for the frame to calculate it’s score,
-its isComplete() will return false; </p>
+<p>If there there aren’t enough rolls for the frame to calculate its score,
+its isComplete() will return false. </p>
 
             </div>
             
@@ -129,7 +124,7 @@ exports.ScoreFrame = <span class="hljs-function"><span class="hljs-keyword">func
               </div>
               <h5 id="-isvalid-">.isValid()</h5>
 <p>This method is used extensively in validating new rolls that are posted
-to the score endpoint.  First we iterate through the 1 to three rolls in this 
+to the score endpoint.  First we iterate through the 1 to 3 rolls in this 
 frame, and if  any aren’t valid, we set invalid rolls to true.</p>
 
             </div>
@@ -234,7 +229,7 @@ supplied,  the total score of the game so far is returned. </p>
               </div>
               <p>First check to make sure that this is a valid frame get a score for.
 If we don’t have enough data for calculating score at the requested frame
-because of strikes or spares,  we’ll return null;</p>
+because of strikes or spares, it will return null;</p>
 
             </div>
             
@@ -302,6 +297,69 @@ contribution to the game’s total score.   </p>
 		i+=<span class="hljs-number">2</span>;
 	}
 	<span class="hljs-keyword">return</span> frames; 
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h3 id="getframebyframescores-rollarray-">getFrameByFrameScores(rollArray)</h3>
+<p>This function returns a ‘pretty’ array of frames, built from a roll array.  Each frame
+in this array has firstRoll and secondRoll properties along with a score property which
+represents the running score up to that point in the game.  </p>
+<p>Spares and strikes are replaced accordingly with ‘/‘ and ‘X’.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.getFrameByFrameScores = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(rollArray)</span></span>{
+	<span class="hljs-keyword">var</span> scoreFrames = scoringService.importRollsToScoreFrames(rollArray); 
+	<span class="hljs-keyword">var</span> runningFrames = [];
+
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">1</span>; i &lt;= scoreFrames.length; i++){
+		<span class="hljs-keyword">var</span> prettyFrame = {},
+			thisFrame = scoreFrames[i-<span class="hljs-number">1</span>];
+		<span class="hljs-keyword">if</span>(thisFrame.isStrike()){
+			prettyFrame.firstRoll = <span class="hljs-string">'X'</span>;
+			prettyFrame.secondRoll = <span class="hljs-string">''</span>; 
+
+			<span class="hljs-keyword">if</span>(i===<span class="hljs-number">10</span>){
+				<span class="hljs-keyword">if</span>(thisFrame.rolls[<span class="hljs-number">1</span>] !== <span class="hljs-literal">undefined</span>){
+					prettyFrame.secondRoll = thisFrame.rolls[<span class="hljs-number">1</span>] === <span class="hljs-number">10</span> ? prettyFrame.secondRoll = <span class="hljs-string">'X'</span> : thisFrame.rolls[<span class="hljs-number">1</span>] + <span class="hljs-string">''</span>; 
+				}
+				<span class="hljs-keyword">if</span>(thisFrame.rolls[<span class="hljs-number">2</span>] !== <span class="hljs-literal">undefined</span>){
+					<span class="hljs-keyword">if</span>(thisFrame.rolls[<span class="hljs-number">2</span>] === <span class="hljs-number">10</span> &amp;&amp; thisFrame.rolls[<span class="hljs-number">1</span>] === <span class="hljs-number">10</span>){
+						prettyFrame.thirdRoll = <span class="hljs-string">'X'</span>;	
+					} 
+					<span class="hljs-keyword">else</span>{
+						prettyFrame.thirdRoll = thisFrame.rolls[<span class="hljs-number">2</span>] === <span class="hljs-number">10</span> ? prettyFrame.thirdRoll = <span class="hljs-string">'/'</span> : thisFrame.rolls[<span class="hljs-number">2</span>] + <span class="hljs-string">''</span>; 
+					}
+				}
+			}
+
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(thisFrame.isSpare()){
+			prettyFrame.firstRoll = thisFrame.rolls[<span class="hljs-number">0</span>] + <span class="hljs-string">''</span>;
+			prettyFrame.secondRoll = <span class="hljs-string">'/'</span>; 
+
+			<span class="hljs-keyword">if</span>(i===<span class="hljs-number">10</span>){
+				<span class="hljs-keyword">if</span>(thisFrame.rolls[<span class="hljs-number">2</span>] !== <span class="hljs-literal">undefined</span>){
+					prettyFrame.thirdRoll = thisFrame.rolls[<span class="hljs-number">2</span>] === <span class="hljs-number">10</span> ? prettyFrame.thirdRoll = <span class="hljs-string">'X'</span>: thisFrame.rolls[<span class="hljs-number">2</span>] + <span class="hljs-string">''</span>;
+				}
+			}
+		}<span class="hljs-keyword">else</span>{
+			prettyFrame.firstRoll = thisFrame.rolls[<span class="hljs-number">0</span>] + <span class="hljs-string">''</span>;
+			prettyFrame.secondRoll = thisFrame.rolls[<span class="hljs-number">1</span>] === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">''</span> : thisFrame.rolls[<span class="hljs-number">1</span>] + <span class="hljs-string">''</span>;
+		}
+
+
+		prettyFrame.score = scoringService.getScoreAtFrame(rollArray, i); 
+		runningFrames.push(prettyFrame);
+	}
+	<span class="hljs-keyword">return</span> runningFrames; 
 };</pre></div></div>
             
         </li>

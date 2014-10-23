@@ -19,11 +19,6 @@
           <div id="jump_page">
             
               
-              <a class="source" href="app.html">
-                app.js
-              </a>
-            
-              
               <a class="source" href="gameController.html">
                 gameController.js
               </a>
@@ -93,13 +88,13 @@
               </div>
               <h3 id="get-scores-scoreid">GET: /scores/:scoreId</h3>
 <p>This endpoint expects nothing but a valid scoreId in the request parameters. </p>
-<pre><code class="lang-url">http://localhost:3000/scores/5447481b12d0a496dfa27bb5[?pretty=true]
+<pre><code class="lang-url">http://localhost:3000/scores/5447481b12d0a496dfa27bb5
 </code></pre>
 <p>In return you’ll receive a score object containing the score’s id, the player
 object this score belongs to, the game id of the game this score belongs to, 
 and a ‘rolls’ property.  The rolls property is an ordered integer array of all 
 the pins knocked down per roll starting from the first roll, to the most recent.</p>
-<pre><code class="lang-js">{
+<pre><code>{
   <span class="hljs-string">"_id"</span>:<span class="hljs-string">"5447481b12d0a496dfa27bb5"</span>,
   <span class="hljs-string">"player"</span>:{
     <span class="hljs-string">"_id"</span>:<span class="hljs-string">"5445cf08faf619d8af4dc8bb"</span>,
@@ -110,13 +105,7 @@ the pins knocked down per roll starting from the first roll, to the most recent.
   <span class="hljs-string">"game"</span>:<span class="hljs-string">"5447481b12d0a496dfa27bb3"</span>,
   <span class="hljs-string">"__v"</span>:<span class="hljs-number">1</span>,
   <span class="hljs-string">"dateCreated"</span>:<span class="hljs-string">"2014-10-22T06:00:59.483Z"</span>,
-  <span class="hljs-string">"rolls"</span>:[ <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span> ]
-}
-</code></pre>
-<p>Requesting with ?pretty=true will return you a formatted score object, with roll data
-broken down into frames, and each containing a running score as the game progresses.</p>
-<pre><code>{
-  <span class="hljs-string">"playerName"</span>:<span class="hljs-string">"Carl"</span>,
+  <span class="hljs-string">"rolls"</span>:[ <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span> ],
   <span class="hljs-string">"frames"</span>:[
     {
       <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"4"</span>,
@@ -154,13 +143,7 @@ broken down into frames, and each containing a running score as the game progres
 		.exec(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, score)</span></span>{
 			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).json({err: err});
 			<span class="hljs-keyword">if</span>(!score) <span class="hljs-keyword">return</span> res.sendStatus(<span class="hljs-number">404</span>);
-			<span class="hljs-keyword">if</span>(req.query.pretty){
-				<span class="hljs-keyword">var</span> prettyScore = {};
-				prettyScore.playerName = score.player.name;
-				prettyScore.frames = scoreController.getFrameByFrameScores(score.rolls); 
-				<span class="hljs-keyword">return</span> res.send(<span class="hljs-built_in">JSON</span>.stringify(prettyScore, <span class="hljs-literal">null</span>, <span class="hljs-string">'\t'</span>));
-			} 
-			<span class="hljs-keyword">return</span> res.send(score.toJSON());
+			<span class="hljs-keyword">return</span> res.status(<span class="hljs-number">200</span>).send(score.toJSON({virtuals: <span class="hljs-literal">true</span>}));
 		});
 	});</pre></div></div>
             
@@ -194,7 +177,34 @@ of the new data will be thrown away and a ‘bad request’ will be returned.</p
   <span class="hljs-string">"game"</span>:<span class="hljs-string">"5447481b12d0a496dfa27bb3"</span>,
   <span class="hljs-string">"__v"</span>:<span class="hljs-number">1</span>,
   <span class="hljs-string">"dateCreated"</span>:<span class="hljs-string">"2014-10-22T06:00:59.483Z"</span>,
-  <span class="hljs-string">"rolls"</span>:[ <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span> ]
+  <span class="hljs-string">"rolls"</span>:[ <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span> ],
+  <span class="hljs-string">"frames"</span>:[
+    {
+      <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"4"</span>,
+      <span class="hljs-string">"secondRoll"</span>:<span class="hljs-string">"5"</span>,
+      <span class="hljs-string">"score"</span>:<span class="hljs-number">9</span>
+    },
+    {
+      <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"X"</span>,
+      <span class="hljs-string">"secondRoll"</span>:<span class="hljs-string">""</span>,
+      <span class="hljs-string">"score"</span>:<span class="hljs-number">27</span>
+    },
+    {
+      <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"4"</span>,
+      <span class="hljs-string">"secondRoll"</span>:<span class="hljs-string">"4"</span>,
+      <span class="hljs-string">"score"</span>:<span class="hljs-number">35</span>
+    },
+    {
+      <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"5"</span>,
+      <span class="hljs-string">"secondRoll"</span>:<span class="hljs-string">"/"</span>,
+      <span class="hljs-string">"score"</span>:<span class="hljs-number">47</span>
+    },
+    {
+      <span class="hljs-string">"firstRoll"</span>:<span class="hljs-string">"2"</span>,
+      <span class="hljs-string">"secondRoll"</span>:<span class="hljs-string">"0"</span>,
+      <span class="hljs-string">"score"</span>:<span class="hljs-number">49</span>
+    }
+  ]
 }
 </code></pre>
 
@@ -206,8 +216,7 @@ of the new data will be thrown away and a ‘bad request’ will be returned.</p
 		scoreController.appendNewRollsToScore(req.param(<span class="hljs-string">'scoreId'</span>), newRolls, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, updatedScore)</span></span>{
 			<span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">400</span>).json({err: err});
 			<span class="hljs-keyword">if</span>(!updatedScore) <span class="hljs-keyword">return</span> res.sendStatus(<span class="hljs-number">404</span>); 
-
-			<span class="hljs-keyword">return</span> res.status(<span class="hljs-number">200</span>).send(updatedScore.toJSON()); 
+			<span class="hljs-keyword">return</span> res.status(<span class="hljs-number">200</span>).send(updatedScore.toJSON({virtuals:<span class="hljs-literal">true</span>})); 
 		});
 	});
 	<span class="hljs-keyword">return</span> scoreResource;   	

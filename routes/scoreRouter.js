@@ -6,13 +6,13 @@ module.exports = function(){
 	// ### GET: /scores/:scoreId
 	// This endpoint expects nothing but a valid scoreId in the request parameters. 
 	// ```url
-	// http://localhost:3000/scores/5447481b12d0a496dfa27bb5[?pretty=true]
+	// http://localhost:3000/scores/5447481b12d0a496dfa27bb5
 	// ``` 
 	// In return you'll receive a score object containing the score's id, the player
 	// object this score belongs to, the game id of the game this score belongs to, 
 	// and a 'rolls' property.  The rolls property is an ordered integer array of all 
 	// the pins knocked down per roll starting from the first roll, to the most recent.
-	// ```js
+	// ```
 	// {
 	//   "_id":"5447481b12d0a496dfa27bb5",
 	//   "player":{
@@ -53,15 +53,14 @@ module.exports = function(){
 	//     }
 	//   ]
 	// }
+	// ```
 	scoreResource.get('/:scoreId', function(req, res, next){
 		Score.findOne({_id : req.param('scoreId')})
 		.populate('player')
 		.exec(function(err, score){
 			if(err) return res.status(500).json({err: err});
 			if(!score) return res.sendStatus(404);
-			score = score.toObject();
-			score.frames = scoreController.getFrameByFrameScores(score.rolls); 
-			return req.query.pretty ? res.send(JSON.stringify(score, null, '\t')) : res.json(score);
+			return res.status(200).send(score.toJSON({virtuals: true}));
 		});
 	});
 	// ### POST: /scores/:scoreId
@@ -125,9 +124,7 @@ module.exports = function(){
 		scoreController.appendNewRollsToScore(req.param('scoreId'), newRolls, function(err, updatedScore){
 			if(err) return res.status(400).json({err: err});
 			if(!updatedScore) return res.sendStatus(404); 
-			updatedScore = score.toObject();
-			updatedScore.frames = scoreController.getFrameByFrameScores(updatedScore.rolls); 
-			return res.status(200).json(updatedScore); 
+			return res.status(200).send(updatedScore.toJSON({virtuals:true})); 
 		});
 	});
 	return scoreResource;   	

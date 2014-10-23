@@ -11,9 +11,7 @@ exports.createGame = function(playerNames, next){
 	if(!playerNames || playerNames.length < 1 || playerNames.length > 6)
 		return next({msg: 'You need 1 to 6 players names for a game of bowling!'});
 
-	// Create a new game instance.  This will generate the game id
-	// that all the score objects need.
-	var newGame = new Game({}); 
+	var newGame = new Game({}); // This will generate the game id that all the score objects need.
 
 	// This passes each player name to the player controller to fetch a
 	// matching player.  If a player doesn't exist matching the name, 
@@ -42,5 +40,18 @@ exports.createGame = function(playerNames, next){
 				return next(null, newGame); 
 			}); 
 		});
+	});
+};
+// ###populatePlayersInGame(game, next)
+// This function takes in a mongoose game object and populates the player property
+// in each of the scores before passing it along.   
+exports.populatePlayersInGame = function(game, next){
+	async.each(game.scores, function(score, done){
+		Score.populate(score, {
+			path: 'player',
+			model: mongoose.model('Player')
+		}, done);	
+	}, function(err){
+		return next(err, game); 
 	});
 };

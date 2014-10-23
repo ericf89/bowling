@@ -74,7 +74,7 @@ describe('The scoreFrame\'s', function(){
 	});
 
 	describe('isSpare() method', function(){
-		it('should return true if the first two rolls sum to 10', function(){
+		it('should return true if the first two rolls sum to 10.', function(){
 			var frame = new ScoreFrame([4, 6]);
 			expect(frame.isSpare()).toBe(true); 
 		});

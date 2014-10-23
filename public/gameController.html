@@ -19,11 +19,6 @@
           <div id="jump_page">
             
               
-              <a class="source" href="app.html">
-                app.js
-              </a>
-            
-              
               <a class="source" href="gameController.html">
                 gameController.js
               </a>
@@ -98,8 +93,10 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>exports.createGame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(playerNames, next)</span></span>{
-	<span class="hljs-keyword">if</span>(!playerNames || playerNames.length &gt; <span class="hljs-number">6</span>)
-		<span class="hljs-keyword">return</span> next({msg: <span class="hljs-string">'Invalid number of players.'</span>});</pre></div></div>
+	<span class="hljs-keyword">if</span>(!playerNames || playerNames.length &lt; <span class="hljs-number">1</span> || playerNames.length &gt; <span class="hljs-number">6</span>)
+		<span class="hljs-keyword">return</span> next({msg: <span class="hljs-string">'You need 1 to 6 players names for a game of bowling!'</span>});
+
+	<span class="hljs-keyword">var</span> newGame = <span class="hljs-keyword">new</span> Game({}); <span class="hljs-comment">// This will generate the game id that all the score objects need.</span></pre></div></div>
             
         </li>
         
@@ -109,22 +106,6 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>Create a new game instance.  This will generate the game id
-that all the score objects need.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> newGame = <span class="hljs-keyword">new</span> Game({});</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>This passes each player name to the player controller to fetch a
 matching player.  If a player doesn’t exist matching the name, 
@@ -138,11 +119,11 @@ a new one is created.   </p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>Now that we have our players, we can make a new score object for each one.
 (Calling .toObject() flattens out the new Score object by removing extraneous
@@ -168,6 +149,32 @@ of calling ‘save’ on each)</p>
 				<span class="hljs-keyword">return</span> next(<span class="hljs-literal">null</span>, newGame); 
 			}); 
 		});
+	});
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h3 id="populateplayersingame-game-next-">populatePlayersInGame(game, next)</h3>
+<p>This function takes in a mongoose game object and populates the player property
+in each of the scores before passing it along.   </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.populatePlayersInGame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(game, next)</span></span>{
+	async.each(game.scores, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(score, done)</span></span>{
+		Score.populate(score, {
+			path: <span class="hljs-string">'player'</span>,
+			model: mongoose.model(<span class="hljs-string">'Player'</span>)
+		}, done);	
+	}, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err)</span></span>{
+		<span class="hljs-keyword">return</span> next(err, game); 
 	});
 };</pre></div></div>
             
